@@ -94,7 +94,7 @@ router.post('/interact', async (req, res) => {
 
     // if interaction wasn't found, then we create new one
     if (result.modifiedCount === 0) {
-      const newInteraction = await UserInteraction.updateOne(
+      await UserInteraction.updateOne(
         { user: sender },
         {
           $push: {
