@@ -14,6 +14,7 @@ router.post('/', async (req, res) => {
     res.status(201).send({ userInteraction });
   } catch (e) {
     console.error(e);
+    console.error(e);
     res.status(400).send(e);
   }
 });
@@ -29,6 +30,7 @@ router.get('/', async (req, res) => {
     res.send(userInteractions);
   } catch (e) {
     console.error(e);
+    console.error(e);
     res.status(400).send(e);
   }
 });
@@ -42,8 +44,9 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const userInteraction = await UserInteraction.findById(id);
-    return !userInteraction ? res.sendStatus(404) : res.send(user);
+    return !userInteraction ? res.sendStatus(404) : res.send(userInteraction);
   } catch (e) {
+    console.error(e);
     return res.sendStatus(400);
   }
 });
@@ -61,6 +64,7 @@ router.delete('/:id', async (req, res) => {
 
     return res.send({ message: 'UserInteraction Deleted' });
   } catch (e) {
+    console.error(e);
     console.error(e);
     return res.sendStatus(400);
   }
@@ -111,6 +115,7 @@ router.post('/interact', async (req, res) => {
 
     return res.status(201).send({ success: true });
   } catch (e) {
+    console.error(e);
     console.error(e);
     return res.status(400).send(e);
   }

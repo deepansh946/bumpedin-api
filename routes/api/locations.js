@@ -14,6 +14,7 @@ router.post('/', async (req, res) => {
     await location.save();
     res.status(201).send({ location });
   } catch (e) {
+    console.error(e);
     res.status(400).send(e);
   }
 });
@@ -28,6 +29,7 @@ router.get('/', async (req, res) => {
     const locations = await Location.find({});
     res.send(locations);
   } catch (e) {
+    console.error(e);
     res.status(400).send(e);
   }
 });
@@ -43,6 +45,7 @@ router.get('/:id', async (req, res) => {
     const location = await Location.findById(id);
     return !location ? res.sendStatus(404) : res.send(location);
   } catch (e) {
+    console.error(e);
     return res.sendStatus(400);
   }
 });
@@ -67,6 +70,7 @@ router.post('/:id', async (req, res) => {
 
     return res.send(location);
   } catch (e) {
+    console.error(e);
     return res.status(400).send(e);
   }
 });
@@ -84,6 +88,7 @@ router.delete('/:id', async (req, res) => {
 
     return res.send({ message: 'Location Deleted' });
   } catch (e) {
+    console.error(e);
     return res.sendStatus(400);
   }
 });
@@ -129,6 +134,7 @@ router.get('/nearby/:id', async (req, res) => {
 
     return res.status(200).send(nearbyUsers);
   } catch (e) {
+    console.error(e);
     console.error(e);
     return res.sendStatus(400);
   }

@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const encrypt = require('mongoose-encryption');
 
 const { Schema } = mongoose;
 
@@ -11,6 +10,15 @@ const locationSchema = Schema(
   },
   { timestamps: true }
 );
+
+const encKey = process.env.BASE32_KEY;
+const sigKey = process.env.BASE64_KEY;
+
+locationSchema.plugin(encrypt, {
+  encryptionKey: encKey,
+  signingKey: sigKey,
+  encryptedFields: ['user', 'location'],
+});
 
 const Location = mongoose.model('Location', locationSchema);
 

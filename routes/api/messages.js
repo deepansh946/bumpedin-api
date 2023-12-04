@@ -13,6 +13,7 @@ router.post('/', async (req, res) => {
     await message.save();
     res.status(201).send({ message });
   } catch (e) {
+    console.error(e);
     res.status(400).send(e);
   }
 });
@@ -27,6 +28,7 @@ router.get('/', async (req, res) => {
     const messages = await Message.find({});
     res.send(messages);
   } catch (e) {
+    console.error(e);
     res.status(400).send(e);
   }
 });
@@ -42,6 +44,7 @@ router.get('/:id', async (req, res) => {
     const message = await Message.findById(id);
     return !message ? res.sendStatus(404) : res.send(message);
   } catch (e) {
+    console.error(e);
     return res.sendStatus(400);
   }
 });
@@ -66,6 +69,7 @@ router.post('/:id', async (req, res) => {
 
     return res.send(message);
   } catch (e) {
+    console.error(e);
     return res.status(400).send(e);
   }
 });
@@ -83,6 +87,7 @@ router.delete('/:id', async (req, res) => {
 
     return res.send({ message: 'Message Deleted' });
   } catch (e) {
+    console.error(e);
     return res.sendStatus(400);
   }
 });
