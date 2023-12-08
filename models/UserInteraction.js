@@ -3,7 +3,7 @@ const encrypt = require('mongoose-encryption');
 
 const { Schema } = mongoose;
 
-const userInteractionSchema = new mongoose.Schema({
+const userInteractionSchema = new Schema({
   user: { type: mongoose.Schema.ObjectId, ref: 'User', required: true },
   connections: [
     {

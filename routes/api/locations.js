@@ -43,7 +43,9 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const location = await Location.findById(id);
-    return !location ? res.sendStatus(404) : res.send(location);
+    return !location
+      ? res.sendStatus(404).json({ success: false, message: 'Location not found' })
+      : res.send(location);
   } catch (e) {
     console.error(e);
     return res.sendStatus(400);
@@ -51,18 +53,19 @@ router.get('/:id', async (req, res) => {
 });
 
 /**
- * @route   POST /locations/:id
+ * @route   PUT /locations/:id
  * @desc    Update location by id
  * @access  Private
  */
-router.post('/:id', async (req, res) => {
+router.put('/:id', async (req, res) => {
   const validationErrors = [];
   const updates = Object.keys(req.body);
 
   try {
     const _id = req.params.id;
     const location = await Location.findById(_id);
-    if (!location) return res.sendStatus(404);
+    if (!location)
+      return res.sendStatus(404).json({ success: false, message: 'Location not found' });
     updates.forEach((update) => {
       location[update] = req.body[update];
     });
@@ -84,7 +87,8 @@ router.delete('/:id', async (req, res) => {
   const _id = req.params.id;
   try {
     const location = await Location.findByIdAndDelete(_id);
-    if (!location) return res.sendStatus(404);
+    if (!location)
+      return res.sendStatus(404).json({ success: false, message: 'Location not found' });
 
     return res.send({ message: 'Location Deleted' });
   } catch (e) {
@@ -114,7 +118,7 @@ router.get('/nearby/:id', async (req, res) => {
 
     if (!userLocation) {
       console.log('User location not found');
-      return res.sendStatus(404);
+      return res.sendStatus(404).json({ success: false, message: 'Location not found' });
     }
 
     const nearbyUsers = await Location.find({
@@ -134,7 +138,6 @@ router.get('/nearby/:id', async (req, res) => {
 
     return res.status(200).send(nearbyUsers);
   } catch (e) {
-    console.error(e);
     console.error(e);
     return res.sendStatus(400);
   }

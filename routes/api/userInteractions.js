@@ -3,6 +3,32 @@ const UserInteraction = require('../../models/UserInteraction');
 const auth = require('../../config/auth');
 
 /**
+ * @route   GET /user-interactions/count
+ * @desc    Count unique user Interactions
+ * @access  Public
+ */
+router.get('/count', async (req, res) => {
+  try {
+    const result = await UserInteraction.aggregate([
+      { $unwind: '$connections' },
+      { $match: { 'connections.status': 'accepted' } },
+      {
+        $group: {
+          _id: '$connections.user',
+        },
+      },
+      { $group: { _id: null, count: { $sum: 1 } } },
+    ]);
+
+    const count = result.length > 0 ? result[0].count : 0;
+
+    return res.status(200).json({ success: true, count });
+  } catch (e) {
+    return res.status(400).send(e);
+  }
+});
+
+/**
  * @route   POST /user-interactions
  * @desc    Register new userInteractions
  * @access  Public
@@ -44,7 +70,9 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const userInteraction = await UserInteraction.findById(id);
-    return !userInteraction ? res.sendStatus(404) : res.send(userInteraction);
+    return !userInteraction
+      ? res.sendStatus(404).json({ success: false, message: 'Message not found' })
+      : res.send(userInteraction);
   } catch (e) {
     console.error(e);
     return res.sendStatus(400);
@@ -60,7 +88,8 @@ router.delete('/:id', async (req, res) => {
   const _id = req.params.id;
   try {
     const userInteractions = await UserInteraction.findByIdAndDelete(_id);
-    if (!userInteractions) return res.sendStatus(404);
+    if (!userInteractions)
+      return res.sendStatus(404).json({ success: false, message: 'Message not found' });
 
     return res.send({ message: 'UserInteraction Deleted' });
   } catch (e) {
@@ -76,7 +105,6 @@ router.delete('/:id', async (req, res) => {
  * @access  Private
  */
 router.post('/interact', async (req, res) => {
-  console.log('here');
   try {
     const {
       body: { sender, receiver, status },
@@ -115,7 +143,6 @@ router.post('/interact', async (req, res) => {
 
     return res.status(201).send({ success: true });
   } catch (e) {
-    console.error(e);
     console.error(e);
     return res.status(400).send(e);
   }

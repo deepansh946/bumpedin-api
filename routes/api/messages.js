@@ -42,7 +42,9 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const message = await Message.findById(id);
-    return !message ? res.sendStatus(404) : res.send(message);
+    return !message
+      ? res.sendStatus(404).json({ success: false, message: 'Message not found' })
+      : res.send(message);
   } catch (e) {
     console.error(e);
     return res.sendStatus(400);
@@ -50,18 +52,18 @@ router.get('/:id', async (req, res) => {
 });
 
 /**
- * @route   POST /messages/:id
+ * @route   PUT /messages/:id
  * @desc    Update message by id
  * @access  Private
  */
-router.post('/:id', async (req, res) => {
+router.put('/:id', async (req, res) => {
   const validationErrors = [];
   const updates = Object.keys(req.body);
 
   try {
     const _id = req.params.id;
     const message = await Message.findById(_id);
-    if (!message) return res.sendStatus(404);
+    if (!message) return res.sendStatus(404).json({ success: false, message: 'Message not found' });
     updates.forEach((update) => {
       message[update] = req.body[update];
     });
@@ -83,7 +85,7 @@ router.delete('/:id', async (req, res) => {
   const _id = req.params.id;
   try {
     const message = await Message.findByIdAndDelete(_id);
-    if (!message) return res.sendStatus(404);
+    if (!message) return res.sendStatus(404).json({ success: false, message: 'Message not found' });
 
     return res.send({ message: 'Message Deleted' });
   } catch (e) {
