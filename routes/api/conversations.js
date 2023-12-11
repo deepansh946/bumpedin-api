@@ -43,12 +43,12 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
     const conversation = await Conversation.findById(id);
     if (!conversation) {
-      return res.sendStatus(404).json({ success: false, message: 'Conversation not found' });
+      return res.status(404).json({ success: false, message: 'Conversation not found' });
     }
     return res.send(conversation);
   } catch (e) {
     console.error(e);
-    return res.sendStatus(400);
+    return res.status(400);
   }
 });
 
@@ -65,7 +65,7 @@ router.put('/:id', async (req, res) => {
     const _id = req.params.id;
     const conversation = await Conversation.findById(_id);
     if (!conversation)
-      return res.sendStatus(404).json({ success: false, message: 'Conversation not found' });
+      return res.status(404).json({ success: false, message: 'Conversation not found' });
     updates.forEach((update) => {
       conversation[update] = req.body[update];
     });
@@ -88,12 +88,12 @@ router.delete('/:id', async (req, res) => {
   try {
     const conversation = await Conversation.findByIdAndDelete(_id);
     if (!conversation)
-      return res.sendStatus(404).json({ success: false, message: 'Conversation not found' });
+      return res.status(404).json({ success: false, message: 'Conversation not found' });
 
     return res.send({ message: 'Conversation Deleted' });
   } catch (e) {
     console.error(e);
-    return res.sendStatus(400);
+    return res.status(400);
   }
 });
 

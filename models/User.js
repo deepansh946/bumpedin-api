@@ -1,4 +1,3 @@
-const encrypt = require('mongoose-encryption');
 const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
@@ -17,24 +16,6 @@ const userSchema = Schema(
   },
   { timestamps: true }
 );
-
-const encKey = process.env.BASE32_KEY;
-const sigKey = process.env.BASE64_KEY;
-
-userSchema.plugin(encrypt, {
-  encryptionKey: encKey,
-  signingKey: sigKey,
-  encryptedFields: [
-    'email',
-    'firstName',
-    'lastName',
-    'designation',
-    'organization',
-    'class',
-    'program',
-    'cohort',
-  ],
-});
 
 const User = mongoose.model('User', userSchema);
 

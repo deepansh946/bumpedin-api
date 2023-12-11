@@ -43,13 +43,13 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
     const message = await Message.findById(id);
     if (!message) {
-      return res.sendStatus(404).json({ success: false, message: 'Message not found' });
+      return res.status(404).json({ success: false, message: 'Message not found' });
     }
 
     return res.send(message);
   } catch (e) {
     console.error(e);
-    return res.sendStatus(400);
+    return res.status(400);
   }
 });
 
@@ -65,7 +65,7 @@ router.put('/:id', async (req, res) => {
   try {
     const _id = req.params.id;
     const message = await Message.findById(_id);
-    if (!message) return res.sendStatus(404).json({ success: false, message: 'Message not found' });
+    if (!message) return res.status(404).json({ success: false, message: 'Message not found' });
     updates.forEach((update) => {
       message[update] = req.body[update];
     });
@@ -87,12 +87,12 @@ router.delete('/:id', async (req, res) => {
   const _id = req.params.id;
   try {
     const message = await Message.findByIdAndDelete(_id);
-    if (!message) return res.sendStatus(404).json({ success: false, message: 'Message not found' });
+    if (!message) return res.status(404).json({ success: false, message: 'Message not found' });
 
     return res.send({ message: 'Message Deleted' });
   } catch (e) {
     console.error(e);
-    return res.sendStatus(400);
+    return res.status(400);
   }
 });
 

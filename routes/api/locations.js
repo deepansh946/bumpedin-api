@@ -2,6 +2,7 @@ const router = require('express').Router();
 const Location = require('../../models/Location');
 const UserInteraction = require('../../models/UserInteraction');
 const auth = require('../../config/auth');
+const mongoose = require('mongoose');
 
 /**
  * @route   POST /locations
@@ -44,13 +45,13 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
     const location = await Location.findById(id);
     if (!location) {
-      return res.sendStatus(404).json({ success: false, message: 'Location not found' });
+      return res.status(404).json({ success: false, message: 'Location not found' });
     }
 
     return res.send(location);
   } catch (e) {
     console.error(e);
-    return res.sendStatus(400);
+    return res.status(400);
   }
 });
 
@@ -66,8 +67,7 @@ router.put('/:id', async (req, res) => {
   try {
     const _id = req.params.id;
     const location = await Location.findById(_id);
-    if (!location)
-      return res.sendStatus(404).json({ success: false, message: 'Location not found' });
+    if (!location) return res.status(404).json({ success: false, message: 'Location not found' });
     updates.forEach((update) => {
       location[update] = req.body[update];
     });
@@ -89,13 +89,12 @@ router.delete('/:id', async (req, res) => {
   const _id = req.params.id;
   try {
     const location = await Location.findByIdAndDelete(_id);
-    if (!location)
-      return res.sendStatus(404).json({ success: false, message: 'Location not found' });
+    if (!location) return res.status(404).json({ success: false, message: 'Location not found' });
 
     return res.send({ message: 'Location Deleted' });
   } catch (e) {
     console.error(e);
-    return res.sendStatus(400);
+    return res.status(400);
   }
 });
 
@@ -108,7 +107,18 @@ router.get('/nearby/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
-    const userLocation = await Location.findOne({ user: id }).sort({ createdAt: -1 }).limit(1);
+    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
+
+    const userLocation = await Location.findOne({
+      user: id,
+      createdAt: { $gte: fifteenMinutesAgo },
+    })
+      .sort({ createdAt: -1 })
+      .limit(1);
+
+    if (!userLocation) {
+      return res.status(404).json({ success: false, message: 'Location not found' });
+    }
 
     const userInteraction = await UserInteraction.findOne({ user: id });
 
@@ -116,10 +126,6 @@ router.get('/nearby/:id', async (req, res) => {
 
     if (userInteraction?.ignoredUsers?.length) {
       ignoredUserIds = userInteraction.ignoredUsers.map(({ user }) => user.toString());
-    }
-
-    if (!userLocation) {
-      return res.sendStatus(404).json({ success: false, message: 'Location not found' });
     }
 
     const nearbyUsers = await Location.find({
@@ -140,7 +146,7 @@ router.get('/nearby/:id', async (req, res) => {
     return res.status(200).send(nearbyUsers);
   } catch (e) {
     console.error(e);
-    return res.sendStatus(400);
+    return res.status(400).send(e);
   }
 });
 

@@ -57,12 +57,12 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
     const user = await User.findById(id);
     if (!user) {
-      return res.sendStatus(404).json({ success: false, message: 'User not found' });
+      return res.status(404).json({ success: false, message: 'User not found' });
     }
     return res.send(user);
   } catch (e) {
     console.error(e);
-    return res.sendStatus(400);
+    return res.status(400);
   }
 });
 
@@ -78,7 +78,7 @@ router.put('/:id', async (req, res) => {
   try {
     const _id = req.params.id;
     const user = await User.findById(_id);
-    if (!user) return res.sendStatus(404).json({ success: false, message: 'User not found' });
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
     updates.forEach((update) => {
       user[update] = req.body[update];
     });
@@ -100,12 +100,12 @@ router.delete('/:id', async (req, res) => {
   const _id = req.params.id;
   try {
     const user = await User.findByIdAndDelete(_id);
-    if (!user) return res.sendStatus(404).json({ success: false, message: 'User not found' });
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
     return res.send({ message: 'User Deleted' });
   } catch (e) {
     console.error(e);
-    return res.sendStatus(400);
+    return res.status(400);
   }
 });
 

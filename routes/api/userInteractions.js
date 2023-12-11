@@ -71,13 +71,13 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
     const userInteraction = await UserInteraction.findById(id);
     if (!userInteraction) {
-      return res.sendStatus(404).json({ success: false, message: 'Message not found' });
+      return res.status(404).json({ success: false, message: 'Message not found' });
     }
 
     return res.send(userInteraction);
   } catch (e) {
     console.error(e);
-    return res.sendStatus(400);
+    return res.status(400);
   }
 });
 
@@ -91,13 +91,13 @@ router.delete('/:id', async (req, res) => {
   try {
     const userInteractions = await UserInteraction.findByIdAndDelete(_id);
     if (!userInteractions)
-      return res.sendStatus(404).json({ success: false, message: 'Message not found' });
+      return res.status(404).json({ success: false, message: 'Message not found' });
 
     return res.send({ message: 'UserInteraction Deleted' });
   } catch (e) {
     console.error(e);
     console.error(e);
-    return res.sendStatus(400);
+    return res.status(400);
   }
 });
 
