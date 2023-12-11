@@ -70,9 +70,11 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const userInteraction = await UserInteraction.findById(id);
-    return !userInteraction
-      ? res.sendStatus(404).json({ success: false, message: 'Message not found' })
-      : res.send(userInteraction);
+    if (!userInteraction) {
+      return res.sendStatus(404).json({ success: false, message: 'Message not found' });
+    }
+
+    return res.send(userInteraction);
   } catch (e) {
     console.error(e);
     return res.sendStatus(400);

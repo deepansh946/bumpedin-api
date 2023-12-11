@@ -43,9 +43,11 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const location = await Location.findById(id);
-    return !location
-      ? res.sendStatus(404).json({ success: false, message: 'Location not found' })
-      : res.send(location);
+    if (!location) {
+      return res.sendStatus(404).json({ success: false, message: 'Location not found' });
+    }
+
+    return res.send(location);
   } catch (e) {
     console.error(e);
     return res.sendStatus(400);
@@ -117,7 +119,6 @@ router.get('/nearby/:id', async (req, res) => {
     }
 
     if (!userLocation) {
-      console.log('User location not found');
       return res.sendStatus(404).json({ success: false, message: 'Location not found' });
     }
 

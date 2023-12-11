@@ -42,9 +42,10 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const conversation = await Conversation.findById(id);
-    return !conversation
-      ? res.sendStatus(404).json({ success: false, message: 'Conversation not found' })
-      : res.send(conversation);
+    if (!conversation) {
+      return res.sendStatus(404).json({ success: false, message: 'Conversation not found' });
+    }
+    return res.send(conversation);
   } catch (e) {
     console.error(e);
     return res.sendStatus(400);
