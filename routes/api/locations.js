@@ -111,7 +111,7 @@ router.get('/nearby/:id', async (req, res) => {
 
     const userLocation = await Location.findOne({
       user: id,
-      createdAt: { $gte: fifteenMinutesAgo },
+      // createdAt: { $gte: fifteenMinutesAgo },
     })
       .sort({ createdAt: -1 })
       .limit(1);
@@ -120,12 +120,15 @@ router.get('/nearby/:id', async (req, res) => {
       return res.status(404).json({ success: false, message: 'Location not found' });
     }
 
-    const userInteraction = await UserInteraction.findOne({ user: id });
+    const userInteraction = await UserInteraction.findOne({
+      user: id,
+      'connections.status': 'rejected',
+    });
 
     let ignoredUserIds = [];
 
-    if (userInteraction?.ignoredUsers?.length) {
-      ignoredUserIds = userInteraction.ignoredUsers.map(({ user }) => user.toString());
+    if (userInteraction?.connections?.length) {
+      ignoredUserIds = userInteraction.connections.map(({ user }) => user.toString());
     }
 
     const nearbyUsers = await Location.find({

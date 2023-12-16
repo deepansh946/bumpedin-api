@@ -40,7 +40,6 @@ router.post('/', async (req, res) => {
     res.status(201).send({ userInteraction });
   } catch (e) {
     console.error(e);
-    console.error(e);
     res.status(400).send(e);
   }
 });
@@ -109,41 +108,57 @@ router.delete('/:id', async (req, res) => {
 router.post('/interact', async (req, res) => {
   try {
     const {
-      body: { sender, receiver, status },
+      body: { sender, receiver },
     } = req;
 
-    // Update or insert the new connection
-    const result = await UserInteraction.updateOne(
-      {
-        user: sender,
-        'connections.user': receiver,
-      },
-      {
-        $set: {
-          'connections.$.status': status,
-          'connections.$.timestamp': new Date(),
-        },
-      }
-    );
+    const existingRequest = await UserInteraction.findOne({
+      user: receiver,
+      'connections.user': sender,
+      'connections.status': 'pending',
+    });
 
-    // if interaction wasn't found, then we create new one
-    if (result.modifiedCount === 0) {
-      await UserInteraction.updateOne(
+    console.log(existingRequest);
+
+    if (existingRequest) {
+      existingRequest.connections[0].status = 'accepted';
+      await existingRequest.save();
+
+      // Add reciprocal connection to both users
+      await UserInteraction.findOneAndUpdate(
         { user: sender },
         {
           $push: {
             connections: {
               user: receiver,
-              status,
-              timestamp: new Date(),
+              timestamp: Date.now(),
+              status: 'accepted',
             },
           },
         },
-        { upsert: true }
+        {
+          upsert: true,
+        }
       );
+
+      return res.status(200).json({ success: true, status: 'accepted' });
     }
 
-    return res.status(201).send({ success: true });
+    // No pending request, send a new connection request
+    await UserInteraction.updateOne(
+      { user: sender },
+      {
+        $push: {
+          connections: {
+            user: receiver,
+            timestamp: Date.now(),
+            status: 'pending',
+          },
+        },
+      },
+      { upsert: true }
+    );
+
+    return res.status(201).json({ success: true, status: 'pending' });
   } catch (e) {
     console.error(e);
     return res.status(400).send(e);
