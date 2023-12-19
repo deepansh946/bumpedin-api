@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const mongoose = require('mongoose');
 const UserInteraction = require('../../models/UserInteraction');
 const auth = require('../../config/auth');
 
@@ -117,8 +118,6 @@ router.post('/interact', async (req, res) => {
       'connections.status': 'pending',
     });
 
-    console.log(existingRequest);
-
     if (existingRequest) {
       existingRequest.connections[0].status = 'accepted';
       await existingRequest.save();
@@ -159,6 +158,46 @@ router.post('/interact', async (req, res) => {
     );
 
     return res.status(201).json({ success: true, status: 'pending' });
+  } catch (e) {
+    console.error(e);
+    return res.status(400).send(e);
+  }
+});
+
+/**
+ * @route   POST /user-interactions/ignore
+ * @desc    Ignore users
+ * @access  Private
+ */
+router.post('/ignore', async (req, res) => {
+  try {
+    const {
+      body: { sender, receiver },
+    } = req;
+
+    let userInteraction = await UserInteraction.findOne({ user: sender });
+
+    if (!userInteraction) {
+      userInteraction = await UserInteraction.create({ user: sender, connections: [] });
+    }
+
+    const existingConnection = userInteraction.connections.find(
+      (connection) => connection.user.toString() === receiver
+    );
+
+    if (existingConnection) {
+      existingConnection.status = 'rejected';
+    } else {
+      userInteraction.connections.push({
+        user: new mongoose.mongo.ObjectId(receiver.trim()),
+        status: 'rejected',
+        timestamp: Date.now()
+      });
+    }
+
+    await userInteraction.save();
+
+    return res.status(201).json({ success: true });
   } catch (e) {
     console.error(e);
     return res.status(400).send(e);

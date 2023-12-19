@@ -2,7 +2,6 @@ const router = require('express').Router();
 const Location = require('../../models/Location');
 const UserInteraction = require('../../models/UserInteraction');
 const auth = require('../../config/auth');
-const mongoose = require('mongoose');
 
 /**
  * @route   POST /locations
